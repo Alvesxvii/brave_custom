@@ -1,0 +1,8 @@
+~/.local/bin/brave-personal
+~/.local/bin/brave-work
+~/.local/share/applications/brave-personal.desktop
+~/.local/share/applications/brave-work.desktop
+~/.local/share/icons/hicolor/256x256/apps/brave-dev.png
+~/.local/share/icons/hicolor/256x256/apps/brave-work-badge.png
+~/.config/BraveSoftware/Brave-Workspace-Personal
+~/.config/BraveSoftware/Brave-Workspace-Work

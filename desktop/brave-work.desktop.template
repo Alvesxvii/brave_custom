@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Brave Trabalho
+GenericName=Web Browser
+Comment=Brave profile for work on Workspace 2
+Exec=__HOME__/.local/bin/brave-work %U
+Terminal=false
+Icon=brave-work-badge
+Categories=Network;WebBrowser;
+StartupNotify=true
+StartupWMClass=BraveWork

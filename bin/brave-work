@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export CHROME_DESKTOP=brave-work.desktop
+BRAVE_USER_DATA_DIR="$HOME/.config/BraveSoftware/Brave-Workspace-Work"
+
+setsid -f /usr/bin/brave-browser-stable \
+    --user-data-dir="$BRAVE_USER_DATA_DIR" \
+    --class=BraveWork \
+    --profile-directory="Profile 1" \
+    "$@" >/tmp/brave-work.launch.log 2>&1
+
+if command -v wmctrl >/dev/null 2>&1; then
+    for _ in $(seq 1 50); do
+        mapfile -t windows < <(wmctrl -lx | grep -F '.BraveWork' | awk '{print $1}')
+        if [ "${#windows[@]}" -gt 0 ]; then
+            for win in "${windows[@]}"; do
+                wmctrl -ir "$win" -t 1 || true
+            done
+            wmctrl -s 1 || true
+            wmctrl -ia "${windows[0]}" || true
+            break
+        fi
+        sleep 0.2
+    done
+fi
+
+exit 0

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export CHROME_DESKTOP=brave-personal.desktop
+BRAVE_USER_DATA_DIR="$HOME/.config/BraveSoftware/Brave-Workspace-Personal"
+
+setsid -f /usr/bin/brave-browser-stable \
+    --user-data-dir="$BRAVE_USER_DATA_DIR" \
+    --class=BravePersonal \
+    --profile-directory=Default \
+    "$@" >/tmp/brave-personal.launch.log 2>&1
+
+if command -v wmctrl >/dev/null 2>&1; then
+    for _ in $(seq 1 50); do
+        mapfile -t windows < <(wmctrl -lx | grep -F '.BravePersonal' | awk '{print $1}')
+        if [ "${#windows[@]}" -gt 0 ]; then
+            for win in "${windows[@]}"; do
+                wmctrl -ir "$win" -t 0 || true
+            done
+            wmctrl -s 0 || true
+            wmctrl -ia "${windows[0]}" || true
+            break
+        fi
+        sleep 0.2
+    done
+fi
+
+exit 0

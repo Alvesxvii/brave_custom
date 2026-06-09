@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Brave DEV
+GenericName=Web Browser
+Comment=Brave profile for personal use on Workspace 1
+Exec=__HOME__/.local/bin/brave-personal %U
+Terminal=false
+Icon=brave-dev
+Categories=Network;WebBrowser;
+StartupNotify=true
+StartupWMClass=BravePersonal
