@@ -33,15 +33,21 @@ require_file "$BRAVE_MASTER_DIR/$BRAVE_DEV_SOURCE_PROFILE"
 require_file "$BRAVE_MASTER_DIR/$BRAVE_WORK_SOURCE_PROFILE"
 require_file "$REPO_DIR/bin/brave-personal"
 require_file "$REPO_DIR/bin/brave-work"
+require_file "$REPO_DIR/bin/workspace-favorites-daemon"
 require_file "$REPO_DIR/desktop/brave-personal.desktop.template"
 require_file "$REPO_DIR/desktop/brave-work.desktop.template"
+require_file "$REPO_DIR/desktop/workspace-favorites-daemon.desktop.template"
 require_file "$REPO_DIR/icons/brave-dev.png"
 require_file "$REPO_DIR/icons/brave-work-badge.png"
+require_file "$REPO_DIR/state/workspace-favorites.config.sample.json"
 
 mkdir -p "$LOCAL_BIN_DIR" "$LOCAL_APPS_DIR" "$LOCAL_ICON_DIR"
+mkdir -p "$HOME/.config/autostart"
+mkdir -p "$HOME/.config/workspace-favorites"
 
 install -m 0755 "$REPO_DIR/bin/brave-personal" "$LOCAL_BIN_DIR/brave-personal"
 install -m 0755 "$REPO_DIR/bin/brave-work" "$LOCAL_BIN_DIR/brave-work"
+install -m 0755 "$REPO_DIR/bin/workspace-favorites-daemon" "$LOCAL_BIN_DIR/workspace-favorites-daemon"
 install -m 0644 "$REPO_DIR/icons/brave-dev.png" "$LOCAL_ICON_DIR/brave-dev.png"
 install -m 0644 "$REPO_DIR/icons/brave-work-badge.png" "$LOCAL_ICON_DIR/brave-work-badge.png"
 
@@ -51,6 +57,15 @@ sed "s|__HOME__|$HOME|g" \
 sed "s|__HOME__|$HOME|g" \
     "$REPO_DIR/desktop/brave-work.desktop.template" \
     > "$LOCAL_APPS_DIR/brave-work.desktop"
+sed "s|__HOME__|$HOME|g" \
+    "$REPO_DIR/desktop/workspace-favorites-daemon.desktop.template" \
+    > "$HOME/.config/autostart/workspace-favorites-daemon.desktop"
+
+if [ ! -f "$HOME/.config/workspace-favorites/config.json" ]; then
+    install -m 0644 \
+        "$REPO_DIR/state/workspace-favorites.config.sample.json" \
+        "$HOME/.config/workspace-favorites/config.json"
+fi
 
 backup_if_exists "$BRAVE_DEV_WRAPPER_DIR"
 backup_if_exists "$BRAVE_WORK_WRAPPER_DIR"
@@ -84,6 +99,9 @@ PY
 update-desktop-database "$LOCAL_APPS_DIR" >/dev/null 2>&1 || true
 gtk-update-icon-cache -f -t "$HOME/.local/share/icons/hicolor" >/dev/null 2>&1 || true
 
+pkill -f '^python3 .*/workspace-favorites-daemon$' >/dev/null 2>&1 || true
+nohup "$LOCAL_BIN_DIR/workspace-favorites-daemon" >/tmp/workspace-favorites-daemon.log 2>&1 &
+
 echo "Installed Brave workspace customization."
 echo "DEV wrapper:  $BRAVE_DEV_WRAPPER_DIR -> $BRAVE_MASTER_DIR/$BRAVE_DEV_SOURCE_PROFILE"
 echo "WORK wrapper: $BRAVE_WORK_WRAPPER_DIR -> $BRAVE_MASTER_DIR/$BRAVE_WORK_SOURCE_PROFILE"
@@ -91,3 +109,9 @@ echo
 echo "If needed, pin these launchers to the Ubuntu Dock:"
 echo "  $LOCAL_APPS_DIR/brave-personal.desktop"
 echo "  $LOCAL_APPS_DIR/brave-work.desktop"
+echo
+echo "Autostart enabled:"
+echo "  $HOME/.config/autostart/workspace-favorites-daemon.desktop"
+echo
+echo "Workspace favorites config:"
+echo "  $HOME/.config/workspace-favorites/config.json"

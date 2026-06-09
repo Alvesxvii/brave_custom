@@ -1,0 +1,42 @@
+{
+  "defaultFavorites": [
+    "org.gnome.Terminal.desktop",
+    "brave-personal.desktop",
+    "brave-work.desktop",
+    "code.desktop",
+    "sublime-text_subl.desktop",
+    "thunderbird_thunderbird.desktop",
+    "filezilla.desktop",
+    "org.gnome.Calculator.desktop",
+    "gimp.desktop",
+    "spotify_spotify.desktop",
+    "org.gnome.Nautilus.desktop"
+  ],
+  "workspaceFavorites": {
+    "0": [
+      "org.gnome.Terminal.desktop",
+      "brave-personal.desktop",
+      "brave-work.desktop",
+      "code.desktop",
+      "sublime-text_subl.desktop",
+      "thunderbird_thunderbird.desktop",
+      "filezilla.desktop",
+      "org.gnome.Calculator.desktop",
+      "gimp.desktop",
+      "spotify_spotify.desktop",
+      "org.gnome.Nautilus.desktop"
+    ],
+    "1": [
+      "org.gnome.Terminal.desktop",
+      "brave-personal.desktop",
+      "brave-work.desktop",
+      "sublime-text_subl.desktop",
+      "thunderbird_thunderbird.desktop",
+      "filezilla.desktop",
+      "org.gnome.Calculator.desktop",
+      "gimp.desktop",
+      "spotify_spotify.desktop",
+      "org.gnome.Nautilus.desktop"
+    ]
+  }
+}

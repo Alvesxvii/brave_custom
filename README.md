@@ -7,6 +7,7 @@ Projeto de customizacao do Brave para Ubuntu GNOME com:
 - um profile Trabalho preso ao Workspace 2
 - icones distintos com badge visual
 - wrappers locais para manter o comportamento persistente fora do pacote oficial do Brave
+- favoritos da dock variando por workspace sem trocar o Ubuntu Dock
 
 ## Objetivo
 
@@ -16,6 +17,7 @@ O resultado final separa:
 
 - `Brave DEV` -> usa o perfil real `Default` e vai para o Workspace 1
 - `Brave Trabalho` -> usa o perfil real `Profile 1` e vai para o Workspace 2
+- `code.desktop` aparece como favorito no Workspace 1 e some no Workspace 2
 
 ## Arquitetura
 
@@ -101,6 +103,38 @@ O script de geracao esta em:
 
 Ele usa `ImageMagick` (`convert`).
 
+### 5. Favoritos diferentes por workspace
+
+Arquivos:
+
+- [bin/workspace-favorites-daemon](/home/alves/genesis/projects/apps/brave_custom/bin/workspace-favorites-daemon)
+- [desktop/workspace-favorites-daemon.desktop.template](/home/alves/genesis/projects/apps/brave_custom/desktop/workspace-favorites-daemon.desktop.template)
+
+Em vez de uma extensao GNOME carregada dentro do processo do Shell, o projeto usa um daemon simples em espaco de usuario. Essa escolha foi feita por estabilidade.
+
+O daemon:
+
+- detecta o workspace ativo com `wmctrl -d`
+- le e grava `org.gnome.shell favorite-apps`
+- salva um estado persistente em `~/.config/workspace-favorites/config.json`
+- aprende alteracoes manuais feitas pelo usuario em cada workspace
+- reaplica a lista correta ao trocar de workspace
+- usa lock para impedir duas instancias simultaneas
+
+Mapeamento atual:
+
+- Workspace 1: lista padrao com `code.desktop`
+- Workspace 2: mesma lista, mas sem `code.desktop`
+- Demais workspaces: usam a lista padrao
+
+Na pratica, isso significa:
+
+- se voce remover um favorito no workspace atual, o daemon salva essa nova lista para aquele workspace
+- se voce adicionar um favorito no workspace atual, o daemon salva tambem
+- no proximo login, a configuracao volta exatamente como ficou por workspace
+
+Essa abordagem preserva o Ubuntu Dock padrao e evita mexer no codigo da extensao oficial da dock.
+
 ## Mapeamento atual dos perfis
 
 No ambiente atual, o Brave esta assim:
@@ -128,7 +162,7 @@ Importante: o nome interno exibido pelo Brave pode nao bater com o nome do diret
 2. Rodar:
 
 ```bash
-chmod +x install.sh verify.sh scripts/generate-icons.sh bin/brave-personal bin/brave-work
+chmod +x install.sh verify.sh scripts/generate-icons.sh bin/brave-personal bin/brave-work bin/workspace-favorites-daemon
 ./install.sh
 ```
 
@@ -136,6 +170,11 @@ chmod +x install.sh verify.sh scripts/generate-icons.sh bin/brave-personal bin/b
 
 - `~/.local/share/applications/brave-personal.desktop`
 - `~/.local/share/applications/brave-work.desktop`
+
+O instalador tambem cria:
+
+- `~/.config/autostart/workspace-favorites-daemon.desktop`
+- `~/.config/workspace-favorites/config.json` se ele ainda nao existir
 
 ### Variaveis uteis
 
@@ -163,12 +202,14 @@ Ele mostra:
 - `Exec`, `Icon` e `StartupWMClass` dos launchers
 - destino dos symlinks dos perfis
 - favoritos atuais da dock no GNOME
+- configuracao persistida de favoritos por workspace
 
 ## Estado da dock
 
 Snapshot do estado atual salvo em:
 
 - [state/favorite-apps.gsettings.txt](/home/alves/genesis/projects/apps/brave_custom/state/favorite-apps.gsettings.txt)
+- [state/workspace-favorites.config.sample.json](/home/alves/genesis/projects/apps/brave_custom/state/workspace-favorites.config.sample.json)
 
 Esse arquivo serve como referencia historica. Nao e aplicado automaticamente pelo instalador porque a dock pode variar de maquina para maquina.
 
@@ -186,6 +227,7 @@ Em qualquer desses casos, este repositório ajuda porque concentra:
 - os wrappers
 - os launchers
 - os icones
+- o daemon de favoritos por workspace
 - a logica de instalacao
 - a documentacao tecnica da customizacao
 

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Workspace Favorites Daemon
+Comment=Switch Ubuntu Dock favorites based on active workspace
+Exec=__HOME__/.local/bin/workspace-favorites-daemon
+Terminal=false
+X-GNOME-Autostart-enabled=true
