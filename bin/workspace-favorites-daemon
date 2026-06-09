@@ -11,7 +11,9 @@ from pathlib import Path
 LOCK_FILE = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "workspace-favorites-daemon.lock"
 CONFIG_DIR = Path.home() / ".config" / "workspace-favorites"
 CONFIG_FILE = CONFIG_DIR / "config.json"
-POLL_INTERVAL = 0.5
+POLL_INTERVAL = 0.1
+APPLY_RETRIES = 3
+APPLY_SETTLE_DELAY = 0.05
 
 
 def run_command(command):
@@ -37,6 +39,15 @@ def set_current_favorites(favorites):
         ["gsettings", "set", "org.gnome.shell", "favorite-apps", repr(favorites)],
         check=True,
     )
+
+
+def apply_favorites(favorites):
+    for _ in range(APPLY_RETRIES):
+        set_current_favorites(favorites)
+        time.sleep(APPLY_SETTLE_DELAY)
+        if get_current_favorites() == favorites:
+            return favorites
+    return get_current_favorites()
 
 
 def ensure_config_dir():
@@ -94,8 +105,7 @@ def main():
     target = favorites_for_workspace(config, current_workspace)
     current_favorites = get_current_favorites()
     if current_favorites != target:
-        set_current_favorites(target)
-        current_favorites = target
+        current_favorites = apply_favorites(target)
 
     persist_workspace_favorites(config, current_workspace, current_favorites)
     last_seen_favorites = current_favorites
@@ -119,8 +129,7 @@ def main():
             current_workspace = active_workspace
             target = favorites_for_workspace(config, current_workspace)
             if live_favorites != target:
-                set_current_favorites(target)
-                live_favorites = target
+                live_favorites = apply_favorites(target)
 
             persist_workspace_favorites(config, current_workspace, live_favorites)
             last_seen_favorites = live_favorites
