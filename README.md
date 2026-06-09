@@ -121,17 +121,22 @@ O daemon:
 - reaplica a lista correta ao trocar de workspace
 - usa lock para impedir duas instancias simultaneas
 
-Mapeamento atual:
+Mapeamento atual de exemplo:
 
-- Workspace 1: lista padrao com `code.desktop`
-- Workspace 2: mesma lista, mas sem `code.desktop`
-- Demais workspaces: usam a lista padrao
+- Workspace 1: lista orientada a DEV
+- Workspace 2: lista orientada a Trabalho
+- Workspace 3 em diante: podem reutilizar a lista padrao ou uma lista propria
 
 Na pratica, isso significa:
 
 - se voce remover um favorito no workspace atual, o daemon salva essa nova lista para aquele workspace
 - se voce adicionar um favorito no workspace atual, o daemon salva tambem
 - no proximo login, a configuracao volta exatamente como ficou por workspace
+
+O arquivo de exemplo versionado em `state/workspace-favorites.config.sample.json` representa um snapshot valido do ambiente em que esta customizacao foi consolidada, mas nao precisa ser copiado literalmente em outra maquina. O comportamento esperado e:
+
+- o instalador cria um estado inicial
+- depois o proprio daemon aprende os ajustes manuais feitos na dock em cada workspace
 
 Essa abordagem preserva o Ubuntu Dock padrao e evita mexer no codigo da extensao oficial da dock.
 
